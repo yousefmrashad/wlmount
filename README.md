@@ -10,7 +10,7 @@ WSL2 allows mounting physical drives, but manually managing cryptsetup, LVM volu
 
 - 🔍 **LUKS Partition Auto-Detection**: Scans and displays available LUKS partitions.
 - 📦 **LVM Support**: Automatically detects and handles LVM Physical Volumes, Volume Groups, and Logical Volumes nested inside the LUKS container.
-- 🔑 **Failsafe Automatic Permissions**: Automatically maps filesystem ownership to your normal non-root WSL user so you can read and write without `sudo`. For system/boot drives, it dynamically targets only your user's `/home/$USER` directory, preserving root permissions on system files (like `/usr/bin/sudo`) and preventing OS corruption. On data drives, it recursively grants access to the entire mount point.
+- 🔑 **System Integrity & Boot Drive Protection**: Preserves critical file ownership on system/boot drives. The script checks if `/home` exists inside the mounted filesystem and, if so, **skips all ownership changes entirely** to keep system directories (like `/usr/bin/sudo`) secure and bootable. On data partitions, it interactive-prompts you before recursively modifying permissions.
 - 📂 **Windows Interop Paths**: Prints the native WSL mount point and the Windows Explorer UNC path (`\\wsl.localhost\...`) for easy access.
 - 🛡️ **Clean Teardown**: Automatically handles unmounting, deactivating LVM Volume Groups, and closing the LUKS mapper safely when you're done.
 

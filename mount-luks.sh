@@ -254,17 +254,19 @@ fi
 
 # Fix ownership so user can read/write without needing root/sudo permissions
 if [ "$NORMAL_USER" != "root" ]; then
-    if [ -d "$MOUNT_POINT/home/$NORMAL_USER" ]; then
-        echo "System drive detected. Safely granting write access ONLY to user home folder..."
-        # We only touch the specific user's folder, preserving the rest of /home
-        chown -R "$NORMAL_USER":"$NORMAL_USER" "$MOUNT_POINT/home/$NORMAL_USER"
-    elif [ -d "$MOUNT_POINT/home" ]; then
-        echo "[WARNING] System drive detected, but user '$NORMAL_USER' does not have a matching home folder here."
-        echo "Skipping ownership changes to prevent system damage."
+    if [ -d "$MOUNT_POINT/home" ]; then
+        echo "System drive detected. Ownership changes skipped to preserve system integrity."
     else
-        echo "Data drive detected. Applying write permissions recursively..."
-        chown "$NORMAL_USER":"$NORMAL_USER" "$MOUNT_POINT"
-        chown -R "$NORMAL_USER":"$NORMAL_USER" "$MOUNT_POINT"
+        echo "No system layout detected. This appears to be a data drive."
+        read -p "Would you like to recursively change the drive's root ownership to '$NORMAL_USER' for write access? [y/N]: " chown_choice
+        chown_choice=${chown_choice:-n}
+        if [[ "$chown_choice" =~ ^[Yy]$ ]]; then
+            echo "Applying write permissions recursively..."
+            chown "$NORMAL_USER":"$NORMAL_USER" "$MOUNT_POINT"
+            chown -R "$NORMAL_USER":"$NORMAL_USER" "$MOUNT_POINT"
+        else
+            echo "Skipping ownership changes."
+        fi
     fi
 fi
 
